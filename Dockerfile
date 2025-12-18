@@ -10,3 +10,4 @@ COPY . .
 RUN chmod +x /booking/docker/*.sh
 
 # CMD убираем — управляем только через docker-compose
+CMD ["sh", "-c", "gunicorn app.main:app --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT"]
