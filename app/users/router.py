@@ -8,13 +8,18 @@ from app.users.dependencies import get_current_user
 from app.users.models import Users
 from app.users.shemas import SUserAuth
 
-router = APIRouter(
-    prefix='/auth',
-    tags=['Auth & Users']
+router_auth = APIRouter(
+    prefix="/auth",
+    tags=["Auth"],
+)
+
+router_users = APIRouter(
+    prefix="/users",
+    tags=["Пользователи"],
 )
 
 
-@router.post('/register')
+@router_auth.post('/register')
 async def register_user(user_date: SUserAuth):
     existing_user = await UsersDAO.find_one_or_none(email=user_date.email)
 
@@ -24,7 +29,7 @@ async def register_user(user_date: SUserAuth):
     hashed_password = get_password_hash(password=user_date.password)
     await UsersDAO.add(email=user_date.email, hashed_password=hashed_password)
 
-@router.post('/login')
+@router_auth.post('/login')
 async def login_user(response: Response, user_date: SUserAuth):
     user = await authenticate_user(user_date.email, user_date.password)
 
@@ -36,11 +41,11 @@ async def login_user(response: Response, user_date: SUserAuth):
     return access_token   
 
 
-@router.post('/logout')
+@router_auth.post('/logout')
 async def log_out(response: Response):
     response.delete_cookie('booking_access_token')
 
-@router.get('/me')
+@router_users.get('/me')
 async def info(current_user: Users = Depends(get_current_user)):
     return current_user
 
